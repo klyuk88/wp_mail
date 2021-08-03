@@ -1,7 +1,19 @@
 <?php
 require( dirname(__FILE__) . '/wp-load.php');
 $c = true;
+$admin_email = get_option('admin_email');
 
+	if ( ! function_exists( 'wp_handle_upload' ) )
+		require_once( ABSPATH . 'wp-admin/includes/file.php' );     
+
+	$file = & $_FILES['user_file'];
+	$overrides = [ 'test_form' => false ];
+	$movefile = wp_handle_upload( $file, $overrides );
+  $attachments = '';
+
+	if ( $movefile && empty($movefile['error']) ) {
+    $attachments = $movefile['file'];
+	}
 
 foreach ( $_POST as $key => $value ) {
 
@@ -21,11 +33,12 @@ $message = "<table style='width: 100%;'>$message</table>";
 
 $headers = array(
     "Content-type: text/html; charset=utf-8",
-    "From: ASX <klyukovskiy@yandex.ru>"
+    "From: Oddbee <".$admin_email.">"
       );
+
           
-wp_mail( 'klyukovskiy@yandex.ru', 'Заявка на расчёт', $message, $headers);
-header('Location: '.site_url('/thanks').'');
+wp_mail( $admin_email, 'mail from Oddbee', $message, $headers, $attachments);
+
 exit;
 
 ?>
